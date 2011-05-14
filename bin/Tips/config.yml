@@ -1,0 +1,13 @@
+# firstMsgDelay is the delay between when Bukkit is started and the first
+# message is displayed. Delay is in 'ticks' == 1/20th of a second.
+firstMsgDelay: 600
+
+# nextMsgDelay is the delay between messages
+nextMsgDelay: 1200
+
+# msgList contains the messages to be displayed.
+msgList:
+    - "Tip #1: This server is running the Tips plugin."
+    - "Tip #2: Your administrator should add Tips to make this more useful. :)"
+    - "Tip #3: There is no third tip."
+
