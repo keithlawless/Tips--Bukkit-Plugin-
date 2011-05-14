@@ -1,0 +1,8 @@
+Tips (Bukkit Plugin)
+
+Tips is a simple plug-in for the Minecraft mod
+server Bukkit.
+
+It allows a server administrator to define short messages (tips) that are periodically displayed to players via chat. 
+
+This is a good way to remind players about server rules, and provide other helpful information, even when you are not logged in to the server.
