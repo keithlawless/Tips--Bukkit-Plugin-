@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="Tips">
+  <artifact type="jar" name="SimpleTips">
     <output-path>$PROJECT_DIR$/bin</output-path>
     <root id="archive" name="Tips.jar">
       <element id="module-output" name="Tips--Bukkit-Plugin-" />

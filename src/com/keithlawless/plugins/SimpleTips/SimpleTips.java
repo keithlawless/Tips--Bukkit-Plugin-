@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.keithlawless.plugins.Tips;
+package com.keithlawless.plugins.SimpleTips;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-public class Tips extends JavaPlugin implements Runnable {
-    private static String version = "Tips v0.2 by keithlawless";
+public class SimpleTips extends JavaPlugin implements Runnable {
+    private static String version = "SimpleTips v0.2 by keithlawless";
     Logger log = Logger.getLogger("Minecraft");
 
 
@@ -53,13 +53,13 @@ public class Tips extends JavaPlugin implements Runnable {
             log.info(version+" Error! Failed to schedule tip display.");
         }
         else {
-            log.info(version+" Success! Tips will be displayed on your schedule.");
+            log.info(version+" Success! SimpleTips will be displayed on your schedule.");
         }
     }
 
     public void load() {
         // YAML configuration file.
-        File mainDirectory = new File("plugins"+File.separator+"Tips");
+        File mainDirectory = new File("plugins"+File.separator+"SimpleTips");
         File file = new File(mainDirectory.getAbsolutePath()+File.separator+"config.yml");
 
         Configuration config;

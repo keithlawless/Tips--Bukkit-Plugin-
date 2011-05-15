@@ -1,3 +1,3 @@
-name: Tips
-main: com.keithlawless.plugins.Tips.Tips
+name: SimpleTips
+main: com.keithlawless.plugins.SimpleTips.SimpleTips
 version: 0.2
