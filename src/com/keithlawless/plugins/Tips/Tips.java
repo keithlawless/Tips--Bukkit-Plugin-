@@ -28,7 +28,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 public class Tips extends JavaPlugin implements Runnable {
-    private static String version = "Tips v0.1 by keithlawless";
+    private static String version = "Tips v0.2 by keithlawless";
     Logger log = Logger.getLogger("Minecraft");
 
 
@@ -99,16 +99,26 @@ public class Tips extends JavaPlugin implements Runnable {
                 e.printStackTrace();
             }
         }
-
     }
 
     public void run() {
         if( msgCount > 0 ) {
-            this.getServer().broadcastMessage(msgs.get(currentMsg));
+            this.getServer().broadcastMessage(escape_colors(msgs.get(currentMsg)));
             currentMsg++;
             if( currentMsg >= msgCount ) {
                 currentMsg = 0;
             }
         }
+    }
+
+    private String escape_colors(String input) {
+        char[] color_codes = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+        String output = new String(input);
+        for( int x = 0; x < color_codes.length; x++ ) {
+            output = output.replace( "%"+color_codes[x], "\u00A7"+color_codes[x]);
+        }
+
+        return output;
     }
 }

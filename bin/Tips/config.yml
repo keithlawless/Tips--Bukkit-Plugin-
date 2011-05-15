@@ -6,8 +6,19 @@ firstMsgDelay: 600
 nextMsgDelay: 1200
 
 # msgList contains the messages to be displayed.
+#
+# Text color is supported using the following color codes:
+# %0 Black                    %8 Dark Gray
+# %1 Dark Blue                %9 Blue
+# %2 Dark Green               %A Green
+# %3 Dark Aqua                %B Aqua
+# %4 Dark Red                 %C Red
+# %5 Dark Purple              %D Light Purple
+# %6 Gold                     %E Yellow
+# %7 Gray                     %F White
+
 msgList:
-    - "Tip #1: This server is running the Tips plugin."
-    - "Tip #2: Your administrator should add Tips to make this more useful. :)"
+    - "%ATip #1: %EThis server is running the %FTips %Eplug-in."
+    - "%ATip #2: %FYour administrator should add Tips to make this more useful. :)"
     - "Tip #3: There is no third tip."
 
