@@ -1,5 +1,5 @@
 /*
- * Tips (http://github.com/)
+ * SimpleTips (http://github.com/keithlawless/Tips--Bukkit-Plugin-)
  * Copyright (C) 2011 Keith Lawless
  *
  * This program is free software: you can redistribute it and/or modify
