@@ -4,6 +4,7 @@
     <root id="archive" name="SimpleTips.jar">
       <element id="module-output" name="Tips--Bukkit-Plugin-" />
       <element id="file-copy" path="$PROJECT_DIR$/src/plugin.yml" />
+      <element id="library" level="project" name="Permissions" />
     </root>
   </artifact>
 </component>

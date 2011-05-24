@@ -1,3 +1,14 @@
 name: SimpleTips
 main: com.keithlawless.plugins.SimpleTips.SimpleTips
-version: 0.2
+version: 0.3
+
+commands:
+    tip:
+        description: Display and edit SimpleTips if you have permission.
+        usage: |
+            Here's how to use the 'tip' command...
+            /tip                        To see a random tip
+            /tip list                   To see a list of all tips
+            /tip add [text]             To add a tip to the list
+            /tip del [num]              To delete a tip
+            /tip replace [num] [text]   To replace a tip with new text
