@@ -5,7 +5,13 @@ firstMsgDelay: 600
 # nextMsgDelay is the delay between messages
 nextMsgDelay: 1200
 
-# msgList contains the messages to be displayed.
+# msgOrder can be either Sequential or Random
+#
+# Sequential messages are displayed in the order they appear in the configuration file.
+# Random messages are displayed in random order. This can be useful if you have a large number of tips.
+msgOrder: Sequential
+
+# msgList contains the messages to be displayed to all players.
 #
 # Text color is supported using the following color codes:
 # %0 Black                    %8 Dark Gray
@@ -21,4 +27,14 @@ msgList:
     - "%ATip #1: %EThis server is running the %FTips %Eplug-in."
     - "%ATip #2: %FYour administrator should add Tips to make this more useful. :)"
     - "Tip #3: There is no third tip."
+
+# msgListByGroup allows you to add additional tips that will only be displayed to members of that group
+# These are in addition to the messages listed in msgList.
+msgListByGroup:
+    Guest:
+        - "Hi Guest! Register on our forums at http://herpie.derpie"
+        - "%FPlease remember to replant trees after you chop them %4completely%F!"
+    Builder:
+        - "You can use the %B/item%F command to give yourself building materials."
+
 

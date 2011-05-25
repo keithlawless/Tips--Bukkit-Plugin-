@@ -35,6 +35,9 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 public class SimpleTips extends JavaPlugin implements Runnable {
+    private static int MSG_ORDER_SEQ = 0;
+    private static int MSG_ORDER_RANDOM = 1;
+
     private static String version = "SimpleTips v0.3 by keithlawless";
     Logger log = Logger.getLogger("Minecraft");
 
@@ -46,6 +49,8 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private int msgCount = 0;
     private int currentMsg = 0;
     private Random random = new Random();
+    private Configuration config;
+    private int msgOrder = MSG_ORDER_SEQ;
 
     public static PermissionHandler permissionHandler;
 
@@ -73,8 +78,6 @@ public class SimpleTips extends JavaPlugin implements Runnable {
         File mainDirectory = new File("plugins"+File.separator+"SimpleTips");
         File file = new File(mainDirectory.getAbsolutePath()+File.separator+"config.yml");
 
-        Configuration config;
-
         if(!file.exists()) {
             try {
                 Vector<String> msgs = new Vector<String>();
@@ -85,7 +88,8 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 config = new Configuration(file);
                 config.setProperty("firstMsgDelay", (30*20));
                 config.setProperty("nextMsgDelay", (30*20));
-                config.setProperty("msgList", (List<String>)msgs);
+                config.setProperty("msgOrder", "Sequential" );
+                config.setProperty("msgList", msgs);
                 config.save();
             }
             catch(Exception e) {
@@ -98,6 +102,12 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 config.load();
                 firstMsgDelay = config.getInt("firstMsgDelay", 0);
                 nextMsgDelay = config.getInt("nextMsgDelay", 0);
+                if((config.getString("msgOrder") != null ) && (config.getString("msgOrder").equalsIgnoreCase("Random"))) {
+                    msgOrder = MSG_ORDER_RANDOM;
+                }
+                else {
+                    msgOrder = MSG_ORDER_SEQ;
+                }
                 msgs = config.getStringList("msgList", new Vector<String>() );
                 if(msgs != null) {
                     msgCount = msgs.size();
@@ -114,7 +124,8 @@ public class SimpleTips extends JavaPlugin implements Runnable {
 
     public void run() {
         if( msgCount > 0 ) {
-            this.getServer().broadcastMessage(escape_colors(msgs.get(currentMsg)));
+            String msg = ( msgOrder == MSG_ORDER_RANDOM ? msgs.get( random.nextInt( msgCount )) : msgs.get(currentMsg));
+            this.getServer().broadcastMessage(escape_colors( msg ));
             currentMsg++;
             if( currentMsg >= msgCount ) {
                 currentMsg = 0;
@@ -138,7 +149,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 return true;
             }
 
-            if( args.length >= 1 ) {
+            if( args.length == 1 ) {
                 // player entered /tip list
                 if( args[0].equalsIgnoreCase("list")) {
 
@@ -154,6 +165,82 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                     return true;
                 }
             }
+
+            if( args.length >= 2  ) {
+                // player entered /tip add [text]
+                if( args[0].equalsIgnoreCase("add")) {
+
+                    if(!SimpleTips.permissionHandler.has(player, "tip.add")) {
+                        player.sendMessage("(SimpleTips) You don't have permission to run that command.");
+                    }
+                    else {
+                        StringBuffer sb = new StringBuffer();
+                        for( int x = 1; x < args.length; x++ ) {
+                            if( x > 1 ) {
+                                sb.append(" ");
+                            }
+                            sb.append( args[x] );
+                        }
+                        msgs.add(new String(sb));
+                        config.setProperty("msgList", msgs);
+                        config.save();
+                        msgCount++;
+                        player.sendMessage("(SimpleTips) Tip has been added.");
+                    }
+                    return true;
+                }
+
+                //player entered /tip del [num]
+                if( args[0].equalsIgnoreCase("del")) {
+                    if(!SimpleTips.permissionHandler.has(player, "tip.del")) {
+                        player.sendMessage("(Simple Tips) You don't have permission to run that command.");
+                    }
+                    else {
+                        try {
+                            int i = Integer.parseInt(args[1]);
+                            msgs.remove(i);
+                            config.setProperty("msgList", msgs);
+                            config.save();
+                            msgCount--;
+                            player.sendMessage("(SimpleTips) Tip has been deleted.");
+                        }
+                        catch(NumberFormatException nfe) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+                if( args[0].equalsIgnoreCase("replace")) {
+                    if(!SimpleTips.permissionHandler.has(player, "tip.replace")) {
+                        player.sendMessage("(Simple Tips) You don't have permission to run that command.");
+                    }
+                    else {
+                        if( args.length < 3 ) {
+                            return false;
+                        }
+                        Integer msgIndex = 0;
+                        try {
+                            msgIndex = Integer.parseInt(args[1]);
+                            StringBuffer sb = new StringBuffer();
+                            for( int x = 2; x < args.length; x++ ) {
+                                if( x > 2 ) {
+                                    sb.append(" ");
+                                }
+                                sb.append( args[x] );
+                            }
+                            msgs.set(msgIndex, new String(sb));
+                            config.setProperty("msgList", msgs);
+                            config.save();
+                            player.sendMessage("(SimpleTips) Tip has been replaced.");
+                        }
+                        catch(NumberFormatException nfe) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -162,9 +249,9 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private void setupPermissions() {
       Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
 
-      if (this.permissionHandler == null) {
+      if (permissionHandler == null) {
           if (permissionsPlugin != null) {
-              this.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
+              permissionHandler = ((Permissions) permissionsPlugin).getHandler();
           } else {
               log.info("Permission system not detected, defaulting to OP");
           }
