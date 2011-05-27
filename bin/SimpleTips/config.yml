@@ -28,13 +28,4 @@ msgList:
     - "%ATip #2: %FYour administrator should add Tips to make this more useful. :)"
     - "Tip #3: There is no third tip."
 
-# msgListByGroup allows you to add additional tips that will only be displayed to members of that group
-# These are in addition to the messages listed in msgList.
-msgListByGroup:
-    Guest:
-        - "Hi Guest! Register on our forums at http://herpie.derpie"
-        - "%FPlease remember to replant trees after you chop them %4completely%F!"
-    Builder:
-        - "You can use the %B/item%F command to give yourself building materials."
-
 
