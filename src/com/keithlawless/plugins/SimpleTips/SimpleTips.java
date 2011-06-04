@@ -38,7 +38,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private static int MSG_ORDER_SEQ = 0;
     private static int MSG_ORDER_RANDOM = 1;
 
-    private static String version = "SimpleTips v0.3 by keithlawless";
+    private static String version = "SimpleTips v0.4 by keithlawless";
     Logger log = Logger.getLogger("Minecraft");
 
 
@@ -153,7 +153,10 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 // player entered /tip list
                 if( args[0].equalsIgnoreCase("list")) {
 
-                    if (!SimpleTips.permissionHandler.has(player, "tip.list")) {
+                    if (( SimpleTips.permissionHandler == null ) && (!sender.isOp())) {
+                        player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
+                    }
+                    else if (( SimpleTips.permissionHandler != null ) && (!SimpleTips.permissionHandler.has(player, "tip.list"))) {
                         player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
@@ -170,8 +173,11 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 // player entered /tip add [text]
                 if( args[0].equalsIgnoreCase("add")) {
 
-                    if(!SimpleTips.permissionHandler.has(player, "tip.add")) {
-                        player.sendMessage("(SimpleTips) You don't have permission to run that command.");
+                    if (( SimpleTips.permissionHandler == null ) && (!sender.isOp())) {
+                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
+                    }
+                    else if (( SimpleTips.permissionHandler != null ) && (!SimpleTips.permissionHandler.has(player, "tip.add"))) {
+                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
                         StringBuffer sb = new StringBuffer();
@@ -192,8 +198,11 @@ public class SimpleTips extends JavaPlugin implements Runnable {
 
                 //player entered /tip del [num]
                 if( args[0].equalsIgnoreCase("del")) {
-                    if(!SimpleTips.permissionHandler.has(player, "tip.del")) {
-                        player.sendMessage("(Simple Tips) You don't have permission to run that command.");
+                    if (( SimpleTips.permissionHandler == null ) && (!sender.isOp())) {
+                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
+                    }
+                    else if (( SimpleTips.permissionHandler != null ) && (!SimpleTips.permissionHandler.has(player, "tip.del"))) {
+                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
                         try {
@@ -212,8 +221,11 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 }
 
                 if( args[0].equalsIgnoreCase("replace")) {
-                    if(!SimpleTips.permissionHandler.has(player, "tip.replace")) {
-                        player.sendMessage("(Simple Tips) You don't have permission to run that command.");
+                    if (( SimpleTips.permissionHandler == null ) && (!sender.isOp())) {
+                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
+                    }
+                    else if (( SimpleTips.permissionHandler != null ) && (!SimpleTips.permissionHandler.has(player, "tip.replace"))) {
+                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
                         if( args.length < 3 ) {
