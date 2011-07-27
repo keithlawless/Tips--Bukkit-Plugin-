@@ -38,7 +38,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private static int MSG_ORDER_SEQ = 0;
     private static int MSG_ORDER_RANDOM = 1;
 
-    private static String version = "SimpleTips v0.5 by keithlawless";
+    private static String version = "SimpleTips v0.6 by keithlawless";
     Logger log = Logger.getLogger("Minecraft");
 
 

@@ -1,6 +1,6 @@
 name: SimpleTips
 main: com.keithlawless.plugins.SimpleTips.SimpleTips
-version: 0.5
+version: 0.6
 
 commands:
     tip:

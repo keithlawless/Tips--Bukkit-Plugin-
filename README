@@ -1,7 +1,6 @@
 SimpleTips (Bukkit Plugin)
 
-SimpleTips is a simple plug-in for the Minecraft mod
-server Bukkit.
+SimpleTips is a simple plug-in for the Minecraft mod server Bukkit.
 
 It allows a server administrator to define short messages (tips) that are periodically displayed to players via chat. 
 
