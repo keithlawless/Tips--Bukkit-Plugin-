@@ -20,36 +20,41 @@ package com.keithlawless.plugins.SimpleTips;
 
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
+import com.sun.corba.se.impl.orbutil.graph.Node;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.util.config.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
 
+import java.awt.image.ImagingOpException;
 import java.io.File;
-import java.util.List;
-import java.util.Random;
-import java.util.Vector;
+import java.io.IOException;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class SimpleTips extends JavaPlugin implements Runnable {
     private static int MSG_ORDER_SEQ = 0;
     private static int MSG_ORDER_RANDOM = 1;
 
-    private static String version = "SimpleTips v0.6 by keithlawless";
+    private static String version = "SimpleTips v1.0 by keithlawless";
     Logger log = Logger.getLogger("Minecraft");
 
 
     // Delay is measured in server ticks, which is 1/20th of a second.
     private Integer firstMsgDelay = 0;
     private Integer nextMsgDelay = 0;
+    private boolean groupMsgEnabled = false;
     private List<String> msgs;
+    private HashMap<String,List<String>> groupMsgs;
     private int msgCount = 0;
     private int currentMsg = 0;
     private Random random = new Random();
-    private Configuration config;
+    private File file;
+    private YamlConfiguration config;
     private int msgOrder = MSG_ORDER_SEQ;
 
     public static PermissionHandler permissionHandler;
@@ -76,7 +81,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     public void load() {
         // YAML configuration file.
         File mainDirectory = new File("plugins"+File.separator+"SimpleTips");
-        File file = new File(mainDirectory.getAbsolutePath()+File.separator+"config.yml");
+        file = new File(mainDirectory.getAbsolutePath()+File.separator+"config.yml");
 
         if(!file.exists()) {
             try {
@@ -85,12 +90,13 @@ public class SimpleTips extends JavaPlugin implements Runnable {
 
                 mainDirectory.mkdirs();
                 file.createNewFile();
-                config = new Configuration(file);
-                config.setProperty("firstMsgDelay", (30*20));
-                config.setProperty("nextMsgDelay", (30*20));
-                config.setProperty("msgOrder", "Sequential" );
-                config.setProperty("msgList", msgs);
-                config.save();
+                config = new YamlConfiguration();
+                config.set("firstMsgDelay", (30 * 20));
+                config.set("nextMsgDelay", (30 * 20));
+                config.set("msgOrder", "Sequential");
+                config.set("msgList", msgs);
+                config.set("groupMsgEnabled", false);
+                config.save(file);
             }
             catch(Exception e) {
                 e.printStackTrace();
@@ -98,8 +104,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
         }
         else {
             try {
-                config = new Configuration(file);
-                config.load();
+                config = YamlConfiguration.loadConfiguration(file);
                 firstMsgDelay = config.getInt("firstMsgDelay", 0);
                 nextMsgDelay = config.getInt("nextMsgDelay", 0);
                 if((config.getString("msgOrder") != null ) && (config.getString("msgOrder").equalsIgnoreCase("Random"))) {
@@ -108,12 +113,27 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 else {
                     msgOrder = MSG_ORDER_SEQ;
                 }
-                msgs = config.getStringList("msgList", new Vector<String>() );
+
+                groupMsgEnabled = config.getBoolean( "groupMsgEnabled", false );
+
+                msgs = config.getStringList("msgList");
                 if(msgs != null) {
                     msgCount = msgs.size();
                 }
                 else {
                     msgCount = 0;
+                }
+
+                if(groupMsgEnabled) {
+                    groupMsgs = new HashMap<String,List<String>>();
+
+                    ConfigurationSection section = config.getConfigurationSection("groupMsgList");
+                    Set<String> keys = section.getKeys(false);
+                    if( keys != null ) {
+                        for ( String groupName : keys) {
+                            groupMsgs.put(groupName.toLowerCase(), section.getStringList(groupName));
+                        }
+                    }
                 }
             }
             catch(Exception e) {
@@ -123,12 +143,38 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     }
 
     public void run() {
+        if(groupMsgEnabled) {
+            groupMessageDisplay();
+        }
+        else {
+            simpleMessageDisplay();
+        }
+    }
+
+    private void simpleMessageDisplay() {
         if( msgCount > 0 ) {
             String msg = ( msgOrder == MSG_ORDER_RANDOM ? msgs.get( random.nextInt( msgCount )) : msgs.get(currentMsg));
             this.getServer().broadcastMessage(escape_colors( msg ));
             currentMsg++;
             if( currentMsg >= msgCount ) {
                 currentMsg = 0;
+            }
+        }
+    }
+
+    private void groupMessageDisplay() {
+        Player[] players = this.getServer().getOnlinePlayers();
+        for( Player player : players ) {
+            String[] groups = permissionHandler.getGroups(player.getWorld().getName(), player.getName());
+            for( String group : groups ) {
+                List<String> msgList = groupMsgs.get(group.toLowerCase());
+                if( msgList != null ) {
+                    int c = msgList.size();
+                    if( c > 0 ) {
+                        String msg = msgList.get( random.nextInt( c ));
+                        player.sendMessage(escape_colors(msg));
+                    }
+                }
             }
         }
     }
@@ -188,10 +234,15 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                             sb.append( args[x] );
                         }
                         msgs.add(new String(sb));
-                        config.setProperty("msgList", msgs);
-                        config.save();
-                        msgCount++;
-                        player.sendMessage("(SimpleTips) Tip has been added.");
+                        config.set("msgList", msgs);
+                        try {
+                            config.save(file);
+                            msgCount++;
+                            player.sendMessage("(SimpleTips) Tip has been added.");
+                        }
+                        catch( IOException e ) {
+                            player.sendMessage("(SimpleTips) Error while saving configuration.");
+                        }
                     }
                     return true;
                 }
@@ -208,10 +259,15 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                         try {
                             int i = Integer.parseInt(args[1]);
                             msgs.remove(i);
-                            config.setProperty("msgList", msgs);
-                            config.save();
-                            msgCount--;
-                            player.sendMessage("(SimpleTips) Tip has been deleted.");
+                            config.set("msgList", msgs);
+                            try {
+                                config.save(file);
+                                msgCount--;
+                                player.sendMessage("(SimpleTips) Tip has been deleted.");
+                            }
+                            catch( IOException e ) {
+                                player.sendMessage("(SimpleTips) Error while saving configuration.");
+                            }
                         }
                         catch(NumberFormatException nfe) {
                             return false;
@@ -242,9 +298,14 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                                 sb.append( args[x] );
                             }
                             msgs.set(msgIndex, new String(sb));
-                            config.setProperty("msgList", msgs);
-                            config.save();
-                            player.sendMessage("(SimpleTips) Tip has been replaced.");
+                            config.set("msgList", msgs);
+                            try {
+                                config.save(file);
+                                player.sendMessage("(SimpleTips) Tip has been replaced.");
+                            }
+                            catch( IOException e ) {
+                                player.sendMessage("(SimpleTips) Error while saving configuration.");
+                            }
                         }
                         catch(NumberFormatException nfe) {
                             return false;
