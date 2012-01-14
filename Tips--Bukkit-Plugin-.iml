@@ -8,7 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Bukkit" level="project" />
-    <orderEntry type="library" name="Permissions" level="project" />
   </component>
 </module>
 

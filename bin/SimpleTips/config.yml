@@ -23,7 +23,7 @@ msgOrder: Sequential
 # %6 Gold                     %E Yellow
 # %7 Gray                     %F White
 
-groupMsgEnabled: True
+groupMsgEnabled: False
 
 # If group messages are enabled above, then msgList is ignored. You must set a unique
 # list of messages for each group that should see messages.
@@ -32,7 +32,8 @@ msgList:
     - "%ATip #2: %FYour administrator should add Tips to make this more useful. :)"
     - "Tip #3: There is no third tip."
 
-# Create a list of messages for each group that should receive messages.
+# Create lists of messages in this section. To enable a permissions group to see a set
+# of messages, give that group a permission like tip.show.[groupname] like tip.show.Guest.
 groupMsgList:
     Guest:
         - "%ATip #1: %EWelcome guest! We are glad to see you."

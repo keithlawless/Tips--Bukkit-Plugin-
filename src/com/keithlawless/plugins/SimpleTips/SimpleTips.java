@@ -18,9 +18,6 @@
 
 package com.keithlawless.plugins.SimpleTips;
 
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
-import com.sun.corba.se.impl.orbutil.graph.Node;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,7 +27,6 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -57,8 +53,6 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private YamlConfiguration config;
     private int msgOrder = MSG_ORDER_SEQ;
 
-    public static PermissionHandler permissionHandler;
-
     public void onDisable() {
         log.info(version+" has been disabled.");
     }
@@ -74,8 +68,6 @@ public class SimpleTips extends JavaPlugin implements Runnable {
         else {
             log.info(version+" Success! SimpleTips will be displayed on your schedule.");
         }
-
-        setupPermissions();
     }
 
     public void load() {
@@ -165,14 +157,18 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private void groupMessageDisplay() {
         Player[] players = this.getServer().getOnlinePlayers();
         for( Player player : players ) {
-            String[] groups = permissionHandler.getGroups(player.getWorld().getName(), player.getName());
+            this.getServer().getLogger().warning("Showing messages to " + player.getName());
+            Set<String> groups = groupMsgs.keySet();
             for( String group : groups ) {
-                List<String> msgList = groupMsgs.get(group.toLowerCase());
-                if( msgList != null ) {
-                    int c = msgList.size();
-                    if( c > 0 ) {
-                        String msg = msgList.get( random.nextInt( c ));
-                        player.sendMessage(escape_colors(msg));
+                String permissionNode = "tip.show."+group;
+                if( player.hasPermission(permissionNode)) {
+                    List<String> msgList = groupMsgs.get(group.toLowerCase());
+                    if( msgList != null ) {
+                        int c = msgList.size();
+                        if( c > 0 ) {
+                            String msg = msgList.get( random.nextInt( c ));
+                            player.sendMessage(escape_colors(msg));
+                        }
                     }
                 }
             }
@@ -199,10 +195,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 // player entered /tip list
                 if( args[0].equalsIgnoreCase("list")) {
 
-                    if (( SimpleTips.permissionHandler == null ) && (!sender.isOp())) {
-                        player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
-                    }
-                    else if (( SimpleTips.permissionHandler != null ) && (!SimpleTips.permissionHandler.has(player, "tip.list"))) {
+                    if (( !player.hasPermission("tip.list")) && (!sender.isOp())) {
                         player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
@@ -219,10 +212,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 // player entered /tip add [text]
                 if( args[0].equalsIgnoreCase("add")) {
 
-                    if (( SimpleTips.permissionHandler == null ) && (!sender.isOp())) {
-                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
-                    }
-                    else if (( SimpleTips.permissionHandler != null ) && (!SimpleTips.permissionHandler.has(player, "tip.add"))) {
+                    if (( !player.hasPermission("tip.addd")) && (!sender.isOp())) {
                             player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
@@ -249,10 +239,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
 
                 //player entered /tip del [num]
                 if( args[0].equalsIgnoreCase("del")) {
-                    if (( SimpleTips.permissionHandler == null ) && (!sender.isOp())) {
-                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
-                    }
-                    else if (( SimpleTips.permissionHandler != null ) && (!SimpleTips.permissionHandler.has(player, "tip.del"))) {
+                    if (( !player.hasPermission("tip.del")) && (!sender.isOp())) {
                             player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
@@ -277,10 +264,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 }
 
                 if( args[0].equalsIgnoreCase("replace")) {
-                    if (( SimpleTips.permissionHandler == null ) && (!sender.isOp())) {
-                            player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
-                    }
-                    else if (( SimpleTips.permissionHandler != null ) && (!SimpleTips.permissionHandler.has(player, "tip.replace"))) {
+                    if (( !player.hasPermission("tip.replace")) && (!sender.isOp())) {
                             player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
@@ -317,18 +301,6 @@ public class SimpleTips extends JavaPlugin implements Runnable {
         }
 
         return false;
-    }
-
-    private void setupPermissions() {
-      Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
-
-      if (permissionHandler == null) {
-          if (permissionsPlugin != null) {
-              permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-          } else {
-              log.info("Permission system not detected, defaulting to OP");
-          }
-      }
     }
 
     private String escape_colors(String input) {

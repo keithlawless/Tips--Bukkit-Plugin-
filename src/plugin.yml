@@ -12,3 +12,21 @@ commands:
             /tip add [text]             To add a tip to the list
             /tip del [num]              To delete a tip
             /tip replace [num] [text]   To replace a tip with new text
+
+permissions:
+    tip.*:
+        description: Grant access to all tip commands.
+        children:
+            tip.list: true
+            tip.add: true
+            tip.del: true
+            tip.replace: true
+    tip.list:
+        description: List the tips for this server.
+    tip.add:
+        description: Add a tip to the server.
+    tip.del:
+        description: Delete a tip from the server.
+    tip.replace:
+        description: Replace a tip with another message (ie. Edit a tip.)
+

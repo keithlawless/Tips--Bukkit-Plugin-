@@ -1,9 +1,11 @@
 <component name="libraryTable">
   <library name="Bukkit">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../craftbukkit-1.0.0-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../craftbukkit-1.0.1-R1.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../craftbukkit-1.0.1-R1.jar!/" />
+    </SOURCES>
   </library>
 </component>
