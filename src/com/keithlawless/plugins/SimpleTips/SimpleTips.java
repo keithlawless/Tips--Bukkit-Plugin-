@@ -36,7 +36,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private static int MSG_ORDER_SEQ = 0;
     private static int MSG_ORDER_RANDOM = 1;
 
-    private static String version = "SimpleTips v1.0 by keithlawless";
+    private static String version = "SimpleTips v1.1 by keithlawless";
     Logger log = Logger.getLogger("Minecraft");
 
 
@@ -46,6 +46,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private boolean groupMsgEnabled = false;
     private List<String> msgs;
     private HashMap<String,List<String>> groupMsgs;
+    private HashMap<String,Integer> groupMsgsCount;
     private int msgCount = 0;
     private int currentMsg = 0;
     private Random random = new Random();
@@ -114,6 +115,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 }
                 else {
                     msgCount = 0;
+                    msgs = new Vector<String>();
                 }
 
                 if(groupMsgEnabled) {
@@ -124,6 +126,8 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                     if( keys != null ) {
                         for ( String groupName : keys) {
                             groupMsgs.put(groupName.toLowerCase(), section.getStringList(groupName));
+                            int count = section.getStringList(groupName).size();
+                            groupMsgsCount.put(groupName.toLowerCase(), new Integer(count));
                         }
                     }
                 }
@@ -186,8 +190,12 @@ public class SimpleTips extends JavaPlugin implements Runnable {
 
             // player entered just /tip by itself - return a random tip
             if( args.length == 0 ) {
-                int x = random.nextInt( msgCount );
-                player.sendMessage( escape_colors(msgs.get(x)));
+                if (msgCount > 0) {
+                    int x = random.nextInt(msgCount);
+                    player.sendMessage(escape_colors(msgs.get(x)));
+                } else {
+                    player.sendMessage("No tips have been defined.");
+                }
                 return true;
             }
 
@@ -212,7 +220,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                 // player entered /tip add [text]
                 if( args[0].equalsIgnoreCase("add")) {
 
-                    if (( !player.hasPermission("tip.addd")) && (!sender.isOp())) {
+                    if (( !player.hasPermission("tip.add")) && (!sender.isOp())) {
                             player.sendMessage( "(SimpleTips) You don't have permission to run that command.");
                     }
                     else {
@@ -250,6 +258,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                             try {
                                 config.save(file);
                                 msgCount--;
+                                currentMsg = 0; // Reset current message counter on each delete
                                 player.sendMessage("(SimpleTips) Tip has been deleted.");
                             }
                             catch( IOException e ) {
@@ -258,6 +267,10 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                         }
                         catch(NumberFormatException nfe) {
                             return false;
+                        }
+                        catch(IndexOutOfBoundsException e) {
+                            player.sendMessage("(SimpleTips) Tip was not found.");
+                            return true;
                         }
                     }
                     return true;
@@ -293,6 +306,10 @@ public class SimpleTips extends JavaPlugin implements Runnable {
                         }
                         catch(NumberFormatException nfe) {
                             return false;
+                        }
+                        catch(IndexOutOfBoundsException e) {
+                            player.sendMessage("(SimpleTips) Tip was not found.");
+                            return true;
                         }
                     }
                     return true;
