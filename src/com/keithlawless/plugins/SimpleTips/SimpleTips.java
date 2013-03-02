@@ -21,24 +21,21 @@ package com.keithlawless.plugins.SimpleTips;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 
 public class SimpleTips extends JavaPlugin implements Runnable {
     private static int MSG_ORDER_SEQ = 0;
     private static int MSG_ORDER_RANDOM = 1;
 
     private static String version = "SimpleTips v1.1 by keithlawless";
-    Logger log = Logger.getLogger("Minecraft");
-
 
     // Delay is measured in server ticks, which is 1/20th of a second.
     private Integer firstMsgDelay = 0;
@@ -55,19 +52,19 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private int msgOrder = MSG_ORDER_SEQ;
 
     public void onDisable() {
-        log.info(version+" has been disabled.");
+        getLogger().info(version+" has been disabled.");
     }
 
     public void onEnable() {
         load();
-        log.info(version+" has been enabled.");
+        getLogger().info(version+" has been enabled.");
         BukkitScheduler scheduler = this.getServer().getScheduler();
-        int result = scheduler.scheduleAsyncRepeatingTask( this, this, firstMsgDelay, nextMsgDelay );
-        if( -1 == result ) {
-            log.info(version+" Error! Failed to schedule tip display.");
+        BukkitTask result = scheduler.runTaskTimerAsynchronously( this, this, firstMsgDelay, nextMsgDelay );
+        if( result.getTaskId() == -1 ) {
+            getLogger().info(version+" Error! Failed to schedule tip display.");
         }
         else {
-            log.info(version+" Success! SimpleTips will be displayed on your schedule.");
+            getLogger().info(version+" Success! SimpleTips will be displayed on your schedule.");
         }
     }
 
@@ -161,7 +158,6 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     private void groupMessageDisplay() {
         Player[] players = this.getServer().getOnlinePlayers();
         for( Player player : players ) {
-            this.getServer().getLogger().warning("Showing messages to " + player.getName());
             Set<String> groups = groupMsgs.keySet();
             for( String group : groups ) {
                 String permissionNode = "tip.show."+group;
