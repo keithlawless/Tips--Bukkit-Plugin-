@@ -18,6 +18,7 @@
 
 package com.keithlawless.plugins.SimpleTips;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -159,8 +160,7 @@ public class SimpleTips extends JavaPlugin implements Runnable {
     }
 
     private void groupMessageDisplay() {
-        Player[] players = this.getServer().getOnlinePlayers();
-        for( Player player : players ) {
+        for( Player player : Bukkit.getOnlinePlayers() ) {
             this.getServer().getLogger().warning("Showing messages to " + player.getName());
             Set<String> groups = groupMsgs.keySet();
             for( String group : groups ) {
